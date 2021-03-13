@@ -2,7 +2,10 @@ import 'dotenv/config'
 import crypto from 'crypto'
 import axios, { Method } from 'axios'
 
-import * as postService from '../service/post-service'
+import { PostsService } from '../service/post-service'
+import { PostsData } from '../data/posts-data'
+import { generateDatabase } from '../infra/database'
+import { Post } from '../entities/post'
 
 const generate = () => {
   return crypto.randomBytes(20).toString('hex')
@@ -12,85 +15,91 @@ const request = async (url: string, method: Method, data?: unknown) => {
   return axios({ url, method, data, validateStatus: () => true })
 }
 
-test('should get a posts', async () => {
-  const post1 = await postService.savePost({ title: generate(), content: generate() })
-  const post2 = await postService.savePost({ title: generate(), content: generate() })
-  const post3 = await postService.savePost({ title: generate(), content: generate() })
+const database = generateDatabase<Post>()
+const postsData = new PostsData(database)
+const postsService = new PostsService(postsData)
 
-  const response = await request('http://localhost:3000/posts', 'get')
+describe('posts integration tests', () => {
+  test('should get a posts', async () => {
+    const post1 = await postsService.savePost({ title: generate(), content: generate() })
+    const post2 = await postsService.savePost({ title: generate(), content: generate() })
+    const post3 = await postsService.savePost({ title: generate(), content: generate() })
 
-  expect(response.status).toBe(200)
+    const response = await request('http://localhost:3000/posts', 'get')
 
-  const posts = response.data
+    expect(response.status).toBe(200)
 
-  expect(posts).toHaveLength(3)
+    const posts = response.data
 
-  await postService.deletePost(post1.id)
-  await postService.deletePost(post2.id)
-  await postService.deletePost(post3.id)
-})
+    expect(posts).toHaveLength(3)
 
-test('should save a post', async () => {
-  const data = ({ title: generate(), content: generate() })
+    await postsService.deletePost(post1.id)
+    await postsService.deletePost(post2.id)
+    await postsService.deletePost(post3.id)
+  })
 
-  const response = await request('http://localhost:3000/posts', 'post', data)
+  test('should save a post', async () => {
+    const data = ({ title: generate(), content: generate() })
 
-  expect(response.status).toBe(201)
+    const response = await request('http://localhost:3000/posts', 'post', data)
 
-  const post = response.data
+    expect(response.status).toBe(201)
 
-  expect(post.title).toBe(data.title)
-  expect(post.content).toBe(data.content)
+    const post = response.data
 
-  await postService.deletePost(post.id)
-})
+    expect(post.title).toBe(data.title)
+    expect(post.content).toBe(data.content)
 
-test('should not save a post', async () => {
-  const data = ({ title: generate(), content: generate() })
+    await postsService.deletePost(post.id)
+  })
 
-  const response1 = await request('http://localhost:3000/posts', 'post', data)
-  const response2 = await request('http://localhost:3000/posts', 'post', data)
+  test('should not save a post', async () => {
+    const data = ({ title: generate(), content: generate() })
 
-  expect(response2.status).toBe(409)
+    const response1 = await request('http://localhost:3000/posts', 'post', data)
+    const response2 = await request('http://localhost:3000/posts', 'post', data)
 
-  const post1 = response1.data
+    expect(response2.status).toBe(409)
 
-  await postService.deletePost(post1.id)
-})
+    const post1 = response1.data
 
-test('should update a post', async () => {
-  const post = await postService.savePost({ title: generate(), content: generate() })
+    await postsService.deletePost(post1.id)
+  })
 
-  post.title = generate()
-  post.content = generate()
+  test('should update a post', async () => {
+    const post = await postsService.savePost({ title: generate(), content: generate() })
 
-  const response = await request(`http://localhost:3000/posts/${post.id}`, 'put', post)
+    post.title = generate()
+    post.content = generate()
 
-  expect(response.status).toBe(204)
+    const response = await request(`http://localhost:3000/posts/${post.id}`, 'put', post)
 
-  const updatedPost = await postService.getPost(post.id)
+    expect(response.status).toBe(204)
 
-  expect(updatedPost.title).toBe(post.title)
-  expect(updatedPost.content).toBe(post.content)
+    const updatedPost = await postsService.getPost(post.id)
 
-  await postService.deletePost(post.id)
-})
-test('should not update a post', async () => {
-  const post = {
-    id: 1
-  }
-  const response = await request(`http://localhost:3000/posts/${post.id}`, 'put', post)
-  expect(response.status).toBe(404)
-})
+    expect(updatedPost.title).toBe(post.title)
+    expect(updatedPost.content).toBe(post.content)
 
-test('should delete a post', async () => {
-  const post = await postService.savePost({ title: generate(), content: generate() })
+    await postsService.deletePost(post.id)
+  })
+  test('should not update a post', async () => {
+    const post = {
+      id: 1
+    }
+    const response = await request(`http://localhost:3000/posts/${post.id}`, 'put', post)
+    expect(response.status).toBe(404)
+  })
 
-  const response = await request(`http://localhost:3000/posts/${post.id}`, 'delete')
+  test('should delete a post', async () => {
+    const post = await postsService.savePost({ title: generate(), content: generate() })
 
-  expect(response.status).toBe(204)
+    const response = await request(`http://localhost:3000/posts/${post.id}`, 'delete')
 
-  const posts = await postService.getPosts()
+    expect(response.status).toBe(204)
 
-  expect(posts).toHaveLength(0)
+    const posts = await postsService.getPosts()
+
+    expect(posts).toHaveLength(0)
+  })
 })
