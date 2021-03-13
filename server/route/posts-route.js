@@ -7,21 +7,27 @@ router.get('/posts', async (request, response) => {
   return response.json(posts)
 })
 
-router.get('/posts/:id', (request, response) => {
 
+router.post('/posts', async (request, response) => {
+  const post = request.body
+  const newPost = await postsService.savePost(post)
+
+  return response.json(newPost)
 })
 
-router.post('/posts', (request, response) => {
+router.put('/posts/:id', async (request, response) => {
+  const post = request.body
+  const { id } = request.params
+  await postsService.updatePost(id, post)
 
+  return response.end()
 })
 
-router.put('/posts/:id', (request, response) => {
+router.delete('/posts/:id', async (request, response) => {
+  const { id } = request.params
+  await postsService.deletePost(id)
 
+  return response.end()
 })
-
-router.delete('/posts/:id', (request, response) => {
-
-})
-
 
 module.exports = router
