@@ -5,11 +5,14 @@
         "node": true,
         "jest/globals": true
     },
+    "parser": "@typescript-eslint/parser",
     "extends": [
-        "standard"
+        "standard",
+        "plugin:@typescript-eslint/recommended"
     ],
     "plugins": [
-        "jest"
+        "jest",
+        "@typescript-eslint"
     ],
     "parserOptions": {
         "ecmaVersion": 12

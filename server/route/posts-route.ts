@@ -1,6 +1,6 @@
-const express = require('express')
+import express from 'express'
+import * as postsService from '../service/post-service'
 const router = express.Router()
-const postsService = require('../service/post-service')
 
 router.get('/posts', async (request, response, next) => {
   try {
@@ -43,4 +43,4 @@ router.delete('/posts/:id', async (request, response, next) => {
   }
 })
 
-module.exports = router
+export { router }

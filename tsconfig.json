@@ -2,12 +2,12 @@
   "compilerOptions": {
     "target": "es5",
     "module": "commonjs",
-    "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
   "include": [
-    "server/**/*.ts"
+    "server/**/*.ts",
+    "server/data/posts-data.js"
   ]
 }

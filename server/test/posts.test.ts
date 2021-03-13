@@ -1,14 +1,15 @@
-require('dotenv/config')
-const axios = require('axios')
-const crypto = require('crypto')
-const postService = require('../service/post-service')
+import 'dotenv/config'
+import crypto from 'crypto'
+import axios, { Method } from 'axios'
+
+import * as postService from '../service/post-service'
 
 const generate = () => {
   return crypto.randomBytes(20).toString('hex')
 }
 
-const request = async (url, method, data) => {
-  return axios({ url, method, data, validateStatus: false })
+const request = async (url: string, method: Method, data?: unknown) => {
+  return axios({ url, method, data, validateStatus: () => true })
 }
 
 test('should get a posts', async () => {

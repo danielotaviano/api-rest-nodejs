@@ -1,11 +1,11 @@
-const pgp = require('pg-promise')()
+import pgPromise from 'pg-promise'
 
-const db = pgp({
+const pgp = pgPromise()
+
+export const db = pgp({
   user: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
   host: process.env.POSTGRES_HOST,
-  port: process.env.POSTGRES_PORT,
+  port: parseInt(process.env.POSTGRES_PORT),
   database: process.env.POSTGRES_DATABASE
 })
-
-module.exports = db
