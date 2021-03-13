@@ -1,7 +1,5 @@
 const pgp = require('pg-promise')()
 
-
-
 const db = pgp({
   user: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,

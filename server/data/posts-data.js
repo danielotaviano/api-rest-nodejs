@@ -18,7 +18,6 @@ exports.savePost = (post) => {
   )
 }
 
-
 exports.deletePost = (id) => {
   return database.none('delete from blog.post where id = $1', [id])
 }

@@ -55,7 +55,6 @@ test('should not save a post', async () => {
   const post1 = response1.data
 
   await postService.deletePost(post1.id)
-
 })
 
 test('should update a post', async () => {

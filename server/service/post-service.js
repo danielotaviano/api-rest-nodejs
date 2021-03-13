@@ -23,7 +23,6 @@ exports.deletePost = (id) => {
 }
 
 exports.updatePost = async (id, post) => {
-
   await exports.getPost(id)
 
   return postsData.updatePost(id, post)

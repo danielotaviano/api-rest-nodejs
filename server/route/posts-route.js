@@ -11,7 +11,6 @@ router.get('/posts', async (request, response, next) => {
   }
 })
 
-
 router.post('/posts', async (request, response, next) => {
   const post = request.body
   try {
@@ -32,7 +31,6 @@ router.put('/posts/:id', async (request, response, next) => {
   } catch (e) {
     next(e)
   }
-
 })
 
 router.delete('/posts/:id', async (request, response, next) => {
